@@ -3,12 +3,13 @@ import argparse
 import logging
 import os
 import pickle  # nosec
+import sys
 import time
 
 import numpy as np
 from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
-
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import crism_ml.preprocessing as cp
 import crism_ml.plot as cpl
 import crism_ml.lab as cl
@@ -286,6 +287,9 @@ def train_model(datadir, fin):
         list of trained models
     """
     xtrain, ytrain, ids = load_data(datadir)
+    logging.info(f"LEN OF XTRAIN =  {len(xtrain)}, {type(xtrain)}")
+    logging.info(f"LEN OF YTRAIN = {len(ytrain)}, {type(ytrain)}")
+    logging.info(f"IDS=  {len(ids)}, {type(ids)},\n, {ids}")
 
     def _train(fm_):
         gmm2 = HBM(only_class=True, prior=HBMPrior(**CONF['model_params']))
@@ -528,7 +532,7 @@ def merge_regions(avgs, merge_classes=True):
     return [_merge_region(regs, kls) for kls, regs in regions.items()]
 
 
-def run_on_images(images, datadir, workdir, thresholds=(0.5, 0.7), plot=False):
+def run_on_images(images, datadir, workdir, thresholds=(0.3, 0.4), plot=False):
     """Train models and run them on a set of images.
 
     Parameters

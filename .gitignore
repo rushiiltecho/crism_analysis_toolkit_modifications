@@ -27,3 +27,7 @@ __pycache__
 
 # project settings
 .vscode
+*.hdr
+*.img
+*.lbl
+results/
