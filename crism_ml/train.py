@@ -147,8 +147,8 @@ def default_data_loader(datadir):
     pixspec = data['pixspec'][:, :cp.N_BANDS]
     pixims = data['pixims'].squeeze()
     pixlabs = cl.relabel(data['pixlabs'].squeeze(), cl.ALIASES_TRAIN)
-
-    return pixspec, pixlabs, pixims
+    pixspec_continuum_removed = cp.remove_continuum(pixspec)
+    return pixspec, pixlabs, pixims, pixspec_continuum_removed
 
 
 @cache_to("dataset.npz", use_version=True)
@@ -172,12 +172,12 @@ def load_data(datadir):
     loader = CONF.get('data_loader', None)
     loader = default_data_loader if loader is None else loader
 
-    pixspec, pixlabs, pixims = loader(datadir)
+    pixspec, pixlabs, pixims, pixspec_continuum_removed = loader(datadir)
     logging.info("Loaded ratioed dataset.")
 
     logging.info("Removing spikes...")
-    pixspec = cp.remove_spikes(
-        pixspec, CONF['despike_params']).astype(np.float32)
+    # pixspec = cp.remove_spikes(pixspec, CONF['despike_params']).astype(np.float32)
+    pixspec = cp.remove_spikes(pixspec_continuum_removed, CONF['despike_params']).astype(np.float32)
     logging.info("Done.")
 
     return pixspec, pixlabs, pixims

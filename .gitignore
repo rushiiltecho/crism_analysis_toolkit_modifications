@@ -30,4 +30,6 @@ __pycache__
 *.hdr
 *.img
 *.lbl
-results/
+*results*/
+*.zip
+output*/

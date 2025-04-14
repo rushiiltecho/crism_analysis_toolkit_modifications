@@ -62,6 +62,14 @@ np.random.seed(42)
 
 class CRISMDataset(Dataset):
     def __init__(self, spectra, labels, augment=True):
+        """
+        Args:
+            spectra (list): List of spectral samples (variable length)
+            labels (list): Corresponding mineral labels
+            augment (bool, optional): Whether to apply random augmentation
+                to spectral samples during training. Defaults to True.
+        """
+        
         self.spectra = spectra
         self.labels = labels
         self.augment = augment

@@ -11,7 +11,7 @@ from joblib import Parallel, delayed
 
 from crism_ml import N_JOBS
 
-N_BANDS = 248
+N_BANDS = 228
 
 BANDS = np.array([
     1.021, 1.02755, 1.0341, 1.04065, 1.0472, 1.05375, 1.0603, 1.06685,
@@ -107,13 +107,23 @@ def remove_continuum(sig, bands=None):
 
     sig = np.atleast_2d(sig)
     not_const = np.ptp(sig, axis=1) > 0
-    flat_sig = np.zeros(sig.shape)
+    # flat_sig = np.zeros(sig.shape)
+    
+    flat_sig = np.zeros_like(sig)
+    curves = np.zeros_like(sig)
+    
+    if np.any(not_const):
+        curves[not_const] = [_resample_convhull(s, bands) for s in sig[not_const]]
+        with np.errstate(invalid='ignore'):  # nan is fine
+            flat_sig[not_const] = sig[not_const] / curves[not_const]
+    
+    return flat_sig, curves
+    
+    # curve = [_resample_convhull(s, bands) for s in sig[not_const]]
+    # with np.errstate(invalid='ignore'):  # nan is fine
+    #     flat_sig[not_const] = sig[not_const] / curve
 
-    curve = [_resample_convhull(s, bands) for s in sig[not_const]]
-    with np.errstate(invalid='ignore'):  # nan is fine
-        flat_sig[not_const] = sig[not_const] / curve
-
-    return flat_sig, curve
+    # return flat_sig, curve
 
 
 def filter_bad_pixels(pixspec, copy=False):
